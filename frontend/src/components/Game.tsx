@@ -1,35 +1,93 @@
-import { useState } from "react"
-
-export default function TicTacToe() {
-
-    return (
-        <>
-            <Game />
-        </>
-    )
-
-}
+import { useCallback, useEffect, useState } from "react";
+import socket from "../utils/Socket";
 
 
-function Game() {
+
+
+export default function Game() {
 
     const [isX, setIsX] = useState(true);
     const [squareArray, setSquareArray] = useState([Array(9).fill(null)]);
     const [currentMove, setCurrentMove] = useState(0);
     const currentSquares = squareArray[currentMove];
 
+    // join room ka state
+    const [roomId, setRoomId] = useState<string>("");
+
+    // player turn ka state
+    const [turn, setTurn] = useState<string>("");
+
+
+    const jumpTo = useCallback((nextMove: number) => {
+        setCurrentMove(nextMove);
+        setIsX(nextMove % 2 === 0);
+
+    }, [])
+
+    useEffect(() => {
+
+        socket.on("receive_updated_squares", (data) => {
+            console.log("user connected.");
+            const nextTransferedArray = [...squareArray, data];
+            setSquareArray(nextTransferedArray);
+            setCurrentMove(nextTransferedArray.length - 1);
+            setIsX(!isX);
+        })
+
+        socket.on("error", (error) => {
+            alert(error);
+        })
+
+        return () => {
+            socket.off("receive_updated_squares");
+            socket.off("error");
+        }
+
+
+    }, [squareArray, isX])
+
+    useEffect(() => {
+        socket.on("game_start", ({turn} : {turn : string}) => {
+            console.log("All players reached in room : ", roomId);
+            setTurn(turn);
+            console.log("Turn : ", turn);
+        })
+
+        return () => {
+            socket.off("game_start");
+        }
+
+
+    }, [roomId]);
+
+    useEffect(() => {
+
+        socket.on("turn_update", ({turn} : {turn : string}) => {
+            setTurn(turn);
+            console.log("Turn : ", turn);
+        })
+
+
+    }, [setTurn]);
+
+
+
+
     function handlePlay(nextSquares: string[]) {
+
+        if(socket.id !== turn){
+            console.log("not your turn , TurnId : " , turn);
+            return;
+        }
+
+
+        socket.emit('send_squares', nextSquares);
 
         const nextHistory = [...squareArray.slice(0, currentMove + 1), nextSquares]
         setSquareArray(nextHistory);
         setCurrentMove(nextHistory.length - 1);
         setIsX(!isX);
 
-    }
-
-    function jumpTo(nextMove: number) {
-        setCurrentMove(nextMove);
-        setIsX(nextMove % 2 === 0);
     }
 
     const moves = squareArray.map((squares, move) => {
@@ -43,12 +101,35 @@ function Game() {
         return (
             <li key={move}>
                 <button onClick={
-                    () => jumpTo(move) 
+                    () => jumpTo(move)
                 } className="past border-1 m-2 p-4 size-fit">{description}</button>
             </li>
         )
 
     })
+
+
+
+    function joinRoom(roomId: string) {
+
+
+        if (roomId === "") {
+            return;
+        }
+
+        socket.emit("join_room", roomId);
+        console.log("Socket" , socket);
+        console.log("Socket ID : " , socket.id);
+        socket.on("joined_room_full", ({ success, reason }) => {
+
+            if (success) {
+                console.log("Joined Room : ", roomId);
+            } else {
+                alert(reason);
+            }
+
+        })
+    }
 
     return (
         <div className="outer-body">
@@ -60,6 +141,17 @@ function Game() {
                 <div className="">History</div>
                 <ol className="grid grid-cols-5">{moves}</ol>
 
+            </div>
+
+            <div className="roomId_outer_shell">
+                <input onChange={(e) => {
+                    setRoomId(e.target.value)
+                 
+                }
+                } type="text" className="roomId_input_box border-1 p-2" />
+                <button onClick={() => {
+                    joinRoom(roomId)
+                }} className="roomId_transfer_button border-1 p-3 m-2">Join Room</button>
             </div>
 
         </div>
