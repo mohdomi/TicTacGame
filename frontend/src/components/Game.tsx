@@ -2,8 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import socket from "../utils/Socket";
 
 
-
-
 export default function Game() {
 
     const [isX, setIsX] = useState(true);
