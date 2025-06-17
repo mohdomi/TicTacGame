@@ -27,10 +27,10 @@ export default function Game() {
     const canAccessPage2 = useNavigationStore((state)=> state.canAccessPage2);
 
     useEffect(()=>{
-        if(!canAccessPage2){
-            console.log("Not authorized.");
-            navigate("/");
-        }
+        // if(!canAccessPage2){
+        //     console.log("Not authorized.");
+        //     navigate("/");
+        // }
 
     } , [canAccessPage2 , navigate]);
 
@@ -143,11 +143,11 @@ export default function Game() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-200 to-emerald-300">
-            <div className="flex flex-col md:flex-row gap-8 bg-gradient-to-br from-emerald-200 to-emerald-400 border-1 border-emerald-600 rounded-xl shadow-xl/20 p-8">
+            <div className="max-w-full flex flex-col md:flex-row gap-8 bg-gradient-to-br from-emerald-200 to-emerald-400 border-1 border-emerald-600 rounded-xl shadow-xl/20 p-8">
             <div className="flex flex-col items-center">
                 <Board square={currentSquares} isX={isX} onPlay={handlePlay} />
             </div>
-            <div className="flex flex-col w-80 bg-emerald-50 rounded-lg shadow p-4">
+            <div className="max-w-full flex flex-col w-80 bg-emerald-50 rounded-lg shadow p-4">
                 <div className="flex-1 mb-4">
                 <ul className="space-y-2 overflow-y-hidden h-full">
                     {messages.map((item, idx) => (
@@ -155,18 +155,18 @@ export default function Game() {
                     ))}
                 </ul>
                 </div>
-                <div className="flex">
+                <div className=" flex">
                 <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && sendMessage()}
                     type="text"
-                    className="flex-1 rounded-l px-3 py-2 border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-white"
+                    className="w-1/3 flex-1 rounded-l px-3 py-2 border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-white"
                     placeholder="Type a message..."
                 />
                 <button
                     onClick={sendMessage}
-                    className="rounded-r bg-emerald-200  text-emerald-900 hover:text-emerald-950 cursor-pointer px-4 py-2 hover:bg-emerald-300  transition"
+                    className=" rounded-r bg-emerald-200  text-emerald-900 hover:text-emerald-950 cursor-pointer px-4 py-2 hover:bg-emerald-300  transition"
                 >
                     Send
                 </button>
