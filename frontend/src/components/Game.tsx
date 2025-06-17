@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import socket from "../utils/Socket";
 
+import { useNavigate } from "react-router-dom";
+import { useNavigationStore } from "../store/navigationStore";
+
+
 export default function Game() {
     const [isX, setIsX] = useState(true);
     const [squareArray, setSquareArray] = useState([Array(9).fill(null)]);
@@ -18,6 +22,23 @@ export default function Game() {
 
     const [messages, setMessages] = useState<{ text: string }[]>([]);
     const [input, setInput] = useState("");
+
+    const navigate = useNavigate();
+    const canAccessPage2 = useNavigationStore((state)=> state.canAccessPage2);
+
+    useEffect(()=>{
+        if(!canAccessPage2){
+            console.log("Not authorized.");
+            navigate("/");
+        }
+
+    } , [canAccessPage2 , navigate]);
+
+    useEffect(()=>{
+                return ()=>{
+            useNavigationStore.getState().resetAccess();
+        }
+    } , []);
 
 
     useEffect(() => {
@@ -94,7 +115,6 @@ export default function Game() {
         () => {
 
             socket.on('receive_message', (data) => {
-                console.log("message : ", data);
                 setMessages(prev => [...prev, data]);
 
             })
@@ -169,7 +189,6 @@ function Board({ square, isX, onPlay }: { square: string[], isX: boolean, onPlay
 
     function handleClick(i: number) {
         if (square[i] || calculateWinner(square)) {
-            console.log(calculateWinner(square));
             return;
         };
         const nextSquares = square.slice();

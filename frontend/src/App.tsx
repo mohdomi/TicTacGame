@@ -3,7 +3,6 @@ import { Route , Routes } from "react-router-dom";
 import Game from "./components/Game";
 import Main from "./components/Main";
 
-
 function App(){
 
     return(

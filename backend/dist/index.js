@@ -7,12 +7,15 @@ const express_1 = __importDefault(require("express"));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const cors_1 = __importDefault(require("cors"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+console.log(process.env.frontend_URL);
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 const server = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: "*",
+        origin: process.env.Frontend_URL,
         methods: ['GET', 'POST']
     }
 });
@@ -20,10 +23,6 @@ const port = 3000;
 const rooms = {};
 io.on('connection', (socket) => {
     console.log("a user connected. id : ", socket.id);
-    socket.on("send_message", (data) => {
-        console.log(data);
-        socket.broadcast.emit('receive_message', data);
-    });
     socket.on("join_room", (roomId) => {
         var _a, _b;
         const roomSize = ((_a = io.sockets.adapter.rooms.get(roomId)) === null || _a === void 0 ? void 0 : _a.size) || 0;
@@ -32,6 +31,10 @@ io.on('connection', (socket) => {
         }
         else {
             socket.join(roomId);
+            socket.on("send_message", (data) => {
+                console.log(data);
+                socket.to(roomId).emit('receive_message', data);
+            });
             console.log((_b = io.sockets.adapter.rooms.get(roomId)) === null || _b === void 0 ? void 0 : _b.size);
             socket.emit("joined_room_full", { success: true, reason: "joined room", });
             if (!rooms[roomId]) {
