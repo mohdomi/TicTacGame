@@ -68,7 +68,7 @@ const Main = () => {
 
                 <div className="container-full size-full flex flex-col justify-center items-center bg-gradient-to-br from-emerald-200  to-emerald-300">
 
-                    <div className="Heading size-2/3 flex flex-col justify-center items-center bg-gradient-to-br from-emerald-200 to-emerald-400 rounded-xl shadow-xl/20 border-bg-emerald-600 border-1 border-gray-500">
+                    <div className="Heading size-9/10 md:size-2/3 flex flex-col justify-center items-center bg-gradient-to-br from-emerald-200 to-emerald-400 rounded-xl shadow-xl/20 border-bg-emerald-600 border-1 border-gray-500">
 
                         <div className="h-1/3 mb-3">
                             <h1 className="text-4xl font-medium font-serif lg:text-6xl">TicTacToeeee...</h1>
