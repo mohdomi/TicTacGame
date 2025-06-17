@@ -20,10 +20,10 @@ const port = 3000;
 const rooms = {};
 io.on('connection', (socket) => {
     console.log("a user connected. id : ", socket.id);
-    // socket.on("send_message", (data) => {
-    //     console.log(data);
-    //     socket.broadcast.emit('receive_message', data)
-    // })
+    socket.on("send_message", (data) => {
+        console.log(data);
+        socket.broadcast.emit('receive_message', data);
+    });
     socket.on("join_room", (roomId) => {
         var _a, _b;
         const roomSize = ((_a = io.sockets.adapter.rooms.get(roomId)) === null || _a === void 0 ? void 0 : _a.size) || 0;
