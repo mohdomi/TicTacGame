@@ -101,6 +101,15 @@ io.on('connection', (socket: Socket) => {
 
                 }
             })
+
+            socket.on("refresh_game", (data) => {
+                console.log(data);
+                if (socket.rooms.has(roomId)) {
+                    socket.to(roomId).emit('receive_updated_squares', data);
+                } else {
+                    socket.emit("error", "Not Authorized.");
+                }
+            })
         }
 
     })

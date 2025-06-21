@@ -140,12 +140,28 @@ export default function Game() {
         setInput("");
     }
 
+    // refresh the game ka logic
+    // yeh point thoda vulnerable h for now leaving it as it is through this anyone can hack the game by sending their logic to the backend
+    // as there is no safety logic for this in the backend
+    const RefreshTheGame : ()=>void = async function  (){
+
+        const refreshedNewArray = Array(9).fill(null);
+
+        socket.emit('refresh_game', refreshedNewArray);
+        setSquareArray([refreshedNewArray]);
+        setCurrentMove(0);
+        setIsX(!isX);
+
+        alert("New Game Started.");
+        return;
+    }
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-200 to-emerald-300">
             <div className="max-w-full flex flex-col md:flex-row gap-8 bg-gradient-to-br from-emerald-200 to-emerald-400 border-1 border-emerald-600 rounded-xl shadow-xl/20 p-8">
             <div className="flex flex-col items-center">
-                <Board square={currentSquares} isX={isX} onPlay={handlePlay} />
+                <Board square={currentSquares} isX={isX} onPlay={handlePlay} RefreshGame={RefreshTheGame} />
             </div>
             <div className="max-w-full flex flex-col w-80 bg-emerald-50 rounded-lg shadow p-4">
                 <div className="flex-1 mb-4">
@@ -177,7 +193,7 @@ export default function Game() {
     )
 }
 
-function Board({ square, isX, onPlay }: { square: string[], isX: boolean, onPlay: (something: string[]) => void }) {
+function Board({ square, isX, onPlay, RefreshGame }: { square: string[], isX: boolean, onPlay: (something: string[]) => void, RefreshGame : ()=>void }) {
     const winner = calculateWinner(square);
 
     let status;
@@ -198,10 +214,14 @@ function Board({ square, isX, onPlay }: { square: string[], isX: boolean, onPlay
         return;
     }
 
+
     return (
         <>
             <div className="status border border-green-200 bg-emerald-50 rounded-lg p-4 mb-6 text-xl font-bold text-emerald-800 shadow">
                 {status}
+                <button onClick={()=>{
+                    RefreshGame();
+                }} className="font-medium rounded bg-emerald-200  text-emerald-900 hover:text-emerald-950 cursor-pointer px-1 sm:px-3 py-2 hover:bg-emerald-300 transition ml-2">New Game</button>
             </div>
             <div className="board flex flex-col gap-2">
                 <div className="board-row flex gap-2">
